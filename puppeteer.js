@@ -35,6 +35,7 @@ const escapeXpathString = str => {
     const page = await browser.newPage();
     await sleep(1000)
     // loadCookies(page)
+
     await page.goto('https://www.whatismybrowser.com/')
     await sleep(1000)
     await page.screenshot({ path: 'example1.png' })

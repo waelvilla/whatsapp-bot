@@ -54,7 +54,8 @@ async function saveCookies(cookies){
 }
 
 async function sendMessage({driver, phone, message}){
-  const url = `https://api.whatsapp.com/send?phone=${phone}`;
+  const encoded = encodeURIComponent(message)
+  const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encoded}`;
   await driver.get(url);
   await driver.wait(until.elementIsVisible(driver.findElement(By.id('action-button'))))
   await (await driver.findElement(By.id('action-button'))).click()
@@ -65,11 +66,14 @@ async function sendMessage({driver, phone, message}){
   try{ 
     try{
     await sleep(5000)
-    await driver.findElement(By.className('_2FVVk _2UL8j')).sendKeys(message, Key.RETURN);
-    } catch(e){
-      console.log('not logged in');
-      await sleep(5000)
-      await driver.findElement(By.className('_2FVVk _2UL8j')).sendKeys(message, Key.RETURN);
+    // _1U1xa
+    await (await driver.findElement(By.className('_1U1xa'))).click()
+    // await driver.findElement(By.className('_2FVVk _2UL8j')).sendKeys(message, Key.RETURN);
+  } catch(e){
+    console.log('not logged in');
+    await sleep(5000)
+    await (await driver.findElement(By.className('_1U1xa'))).click()
+      // await driver.findElement(By.className('_2FVVk _2UL8j')).sendKeys(message, Key.RETURN);
     }
   } catch(e){
     console.log('failed to send message');
@@ -77,16 +81,13 @@ async function sendMessage({driver, phone, message}){
 }
 
 (async function run() {
-  let driver = await new Builder().forBrowser('safari').build();
+  let driver = await new Builder().forBrowser('chrome').build();
   try {
     const phones = await getPhones();
-    const message = 
-  `منتسيبسيبسيب 
-  شبيشب شيب س
-  يبسيب سب
-  `
+
   let i=1
-    for(const phone of phones){
+    for(const user of phones){
+      const {phone, message} = user
       console.log(`run ${i}: ${phone}`);
       try{
       await sendMessage({driver, phone, message})

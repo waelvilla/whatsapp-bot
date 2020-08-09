@@ -65,7 +65,7 @@ async function saveCookies(cookies){
   });
 }
 
-async function sendMessage({driver, phone, message}){
+async function sendMessage({driver, actions, phone, message}){
   const encoded = encodeURIComponent(message)
   const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encoded}`;
   await driver.get(url);
@@ -95,21 +95,23 @@ async function sendMessage({driver, phone, message}){
 (async function run() {
   let driver = await new Builder().forBrowser('chrome').build();
   try {
+    const actions = driver.actions()
     const phones = await getPhones();
     const message = await getMessage()
+    actions.sendKeys(Key.chord(Key.CONTROL, "p")).perform()
     let i=1 
-    for(const user of phones){
-      const {phone, gender} = user
-      console.log(`run ${i}: ${phone}`);
-      // let message = await getMessage()
-      try{
-      await sendMessage({driver, phone, message})
-      } catch(e){
-        console.log('failed to send to ', phone);
-      }
-      i++
-      await sleep(10000)
-    }
+    // for(const user of phones){
+    //   const {phone, gender} = user
+    //   console.log(`run ${i}: ${phone}`);
+    //   // let message = await getMessage()
+    //   try{
+    //   await sendMessage({driver, actions, phone, message})
+    //   } catch(e){
+    //     console.log('failed to send to ', phone);
+    //   }
+    //   i++
+    //   await sleep(10000)
+    // }
     await sleep(5000)
     console.log('done');
   } finally {

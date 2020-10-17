@@ -10,20 +10,6 @@ const sleep = async (time) => {
   })
 }
 
-async function getPhonesText(){
-  return new Promise((resolve, reject)=> {
-    fs.readFile('./old-phones.json', (err, data) => {
-      if(err){
-        console.log('err', err);
-        reject(err)
-        return;
-      }
-      const parsed = JSON.parse(data)
-      resolve(parsed)
-    })
-  })
-}
-
 async function getPhonesCSV(){
   return new Promise((resolve, reject) => {
       const data = []
@@ -33,7 +19,12 @@ async function getPhonesCSV(){
           data.push(row)
       })
       .on('end', () => {
-          resolve(data);
+        const phones = data.map((obj) => {
+          if(obj['phone']){
+            return obj['phone'].replace(',','')
+          }
+        })
+          resolve(phones);
       }).on('error', (err) => {
           reject(err)
       });
@@ -130,13 +121,17 @@ async function sendMessage({driver, phone, message}){
   try{ 
     try{
     await sleep(6000)
+    await driver.wait(until.elementIsVisible(driver.findElement(By.className('_1U1xa'))))
     await (await driver.findElement(By.className('_1U1xa'))).click() //click send text
     await sleep(500)
     // await driver.findElement(By.className('_2FVVk _2UL8j')).sendKeys(message, Key.RETURN); //clicks "Enter" to send text
   } catch(e){
     console.log('not logged in');
+    await driver.wait(until.elementLocated(driver.findElement(By.className('_1U1xa'))))
     await sleep(5000)
-    await (await driver.findElement(By.className('_1U1xa'))).click() //click send text
+    driver.get('about:blank');
+    await driver.switchTo().alert().accept();
+    // await (await driver.findElement(By.className('_1U1xa'))).click() //click send text
       // await driver.findElement(By.className('_2FVVk _2UL8j')).sendKeys(message, Key.RETURN); //clicks "Enter" to send text
     }
   } catch(e){
@@ -152,12 +147,11 @@ async function sendMessage({driver, phone, message}){
     // const message = ''
     // await driver.actions().keyDown(Key.CONTROL).sendKeys('a').perform();
     let i=1 
-    for(const user of phones){
-      const {phone, gender} = user
+    for(const phone of phones){
       console.log(`run ${i}: ${phone}`);
-      // let message = await getMessage()
+      let message = await getMessage()
       try{
-      // await sendMessage({driver, phone, message})
+      await sendMessage({driver, phone, message})
       } catch(e){
         console.log(e);
         console.log('failed to send to ', phone);

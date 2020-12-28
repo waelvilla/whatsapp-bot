@@ -72,14 +72,14 @@ async function sendMessage({ driver, phone, message }) {
     let sendButtonLocated = false;
     while (!sendButtonLocated) {
       try {
-        await driver.wait(until.elementIsVisible(await driver.findElement(By.className('_1U1xa'))))
+        await driver.wait(until.elementIsVisible(await driver.findElement(By.className('_2Ujuu'))))
         sendButtonLocated = true;
       } catch (e) {
         await sleep(1000)
       }
     }
-    await (await driver.findElement(By.className('_1U1xa'))).click() //click send text
-    await sleep(500)
+    await (await driver.findElement(By.className('_2Ujuu'))).click() //click send text
+    await sleep(3000)
     // await driver.findElement(By.className('_2FVVk _2UL8j')).sendKeys(message, Key.RETURN); //clicks "Enter" to send text
   } catch (e) {
     console.log('not logged in');

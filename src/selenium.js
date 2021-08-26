@@ -2,6 +2,7 @@ const fs = require('fs')
 const { Builder, By, Key, until, } = require('selenium-webdriver');
 const getPhones = require('./getPhones')
 
+const SEND_BUTTON_CLASS = '_4sWnG'
 const sleep = async (time) => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -25,12 +26,12 @@ async function getMessage() {
 }
 
 async function paste(driver) {
-  await driver.findElement(By.className('_2FVVk _2UL8j')).sendKeys(Key.chord(Key.CONTROL, 'v'));
+  await driver.findElement(By.className(SEND_BUTTON_CLASS)).sendKeys(Key.chord(Key.CONTROL, 'v'));
 }
 
 async function sendImageMessage({ driver, phone, message }) {
   const encoded = encodeURIComponent(message)
-  const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encoded}`;
+  const url = `https://api.whatsapp.com/send?lang=en&phone=${phone}&text=${encoded}`;
   await driver.get(url);
   await driver.wait(until.elementIsVisible(driver.findElement(By.id('action-button'))))
   await (await driver.findElement(By.id('action-button'))).click()
@@ -58,7 +59,7 @@ async function sendImageMessage({ driver, phone, message }) {
 
 async function sendMessage({ driver, phone, message }) {
   const encoded = encodeURIComponent(message)
-  const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encoded}`;
+  const url = `https://api.whatsapp.com/send?lang=en&phone=${phone}&text=${encoded}`;
   await driver.get(url);
   try {
     await driver.switchTo().alert().accept();
@@ -72,15 +73,16 @@ async function sendMessage({ driver, phone, message }) {
     let sendButtonLocated = false;
     while (!sendButtonLocated) {
       try {
-        await driver.wait(until.elementIsVisible(await driver.findElement(By.className('_2Ujuu'))))
+        await driver.wait(until.elementIsVisible(await driver.findElement(By.className(SEND_BUTTON_CLASS))))
+        // await driver.wait(until.elementIsVisible(await driver.findElement(By.className('_2Ujuu'))))
         sendButtonLocated = true;
       } catch (e) {
         await sleep(1000)
       }
     }
-    await (await driver.findElement(By.className('_2Ujuu'))).click() //click send text
+    await (await driver.findElement(By.className(SEND_BUTTON_CLASS))).click() //click send text
+    // await driver.findElement(By.className('_1JAUF _2x4bz')).sendKeys(message, Key.RETURN); //clicks "Enter" to send text
     await sleep(3000)
-    // await driver.findElement(By.className('_2FVVk _2UL8j')).sendKeys(message, Key.RETURN); //clicks "Enter" to send text
   } catch (e) {
     console.log('not logged in');
     console.log('e', e);

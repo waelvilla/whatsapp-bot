@@ -12,7 +12,11 @@ async function getPhonesCSV(){
         .on('end', () => {
           const phones = data.map((obj) => {
             if(obj['phone']){
-              return obj['phone'].replace(/\D/g,'');
+              let phone = obj['phone'].replace(/\D/g,'');
+              if (phone[0] == '5') {
+                phone = '966'+ phone
+              }
+              return phone
             }
           })
             resolve(phones);
